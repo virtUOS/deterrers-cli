@@ -10,7 +10,7 @@ def read(filename):
 
 setup(
     name='deterrers-cli',
-    version='0.2',
+    version='0.3',
     description='Command line client for DETERRERS',
     url='https://github.com/virtUOS/proteuscmd',
     author='Lars Kiesow',

@@ -58,11 +58,13 @@ def delete(ipv4):
 
 @cli.command()
 @click.option('--admin', '-a', multiple=True, required=True)
+@click.option('--profile', '-p', default='', type=profiles)
+@click.option('--firewall', '-f', default='', type=host_firewalls)
 @click.argument('ipv4')
-def add(ipv4, admin):
+def add(ipv4, admin, profile, firewall):
     '''Add IP address to DETERRERS.
     '''
-    deterrers.add(ipv4, admin)
+    deterrers.add(ipv4, admin, profile, firewall)
 
 
 @cli.command()

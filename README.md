@@ -55,6 +55,8 @@ Usage: python -m deterrerscli add [OPTIONS] IPV4
 
 Options:
   -a, --admin TEXT  [required]
+  -p, --profile [|HTTP|SSH|HTTP+SSH|Multipurpose]
+  -f, --firewall [|UFW|FirewallD|nftables]
   --help            Show this message and exit.
 ```
 
@@ -64,8 +66,8 @@ Options:
 # Delete IP 192.0.0.1 from DETERRERS
 ❯ deterrers-cli delete 192.0.0.1
 
-# Add IP 192.0.0.1 with group `virtUOS` as admins
-❯ deterrers-cli add --admin virtUOS 192.0.0.1
+# Add IP 192.0.0.1 with group `virtUOS` as admins and firewall profile `Multipurpose`
+❯ deterrers-cli add --admin virtUOS --profile multipurpose 192.0.0.1
 
 # Set firewall profile `SSH`
 ❯ deterrers-cli update --profile ssh 192.0.0.1
