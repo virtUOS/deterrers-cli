@@ -68,13 +68,18 @@ def add(ipv4, admin, profile, firewall):
 
 
 @cli.command()
-@click.option('--profile', '-p', default='', type=profiles)
-@click.option('--firewall', '-f', default='', type=host_firewalls)
+@click.option('--admin', '-a', default=None, multiple=True)
+@click.option('--profile', '-p', default=None, type=profiles)
+@click.option('--firewall', '-f', default=None, type=host_firewalls)
 @click.argument('ipv4')
-def update(ipv4, profile, firewall):
+def update(ipv4, admin, profile, firewall):
     '''Update IP address in DETERRERS.
+
+    Fields which are not specified will not be changed.
+    The option `admin` can be used multiple times.
     '''
-    deterrers.update(ipv4, profile, firewall)
+    admin = admin or None
+    deterrers.update(ipv4, profile, firewall, admin)
 
 
 @cli.group()
