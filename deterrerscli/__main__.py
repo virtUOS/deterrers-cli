@@ -7,6 +7,7 @@ import yaml
 from deterrerscli.types import IPV4_TYPE
 
 deterrers = None
+auto_register = False
 
 profiles = click.Choice(
         ('', 'HTTP', 'SSH', 'HTTP+SSH', 'Multipurpose'),
@@ -26,9 +27,11 @@ def print_format(data, format: str):
 @click.group()
 def cli():
     global deterrers
+    global auto_register
     with open(pathlib.Path().home() / '.deterrers.yml', 'r') as f:
         config = yaml.safe_load(f)
     deterrers = deterrersapi.Deterrers(config['url'], config['token'])
+    auto_register = config.get('auto-register', False)
 
 
 @cli.command()
@@ -62,11 +65,14 @@ def delete(ipv4):
 @click.option('--admin', '-a', multiple=True, required=True)
 @click.option('--profile', '-p', default='', type=profiles)
 @click.option('--firewall', '-f', default='', type=host_firewalls)
+@click.option('--register/--no-register', default=False)
 @click.argument('ipv4', type=IPV4_TYPE)
-def add(ipv4, admin, profile, firewall):
+def add(ipv4, admin, profile, firewall, register):
     '''Add IP address to DETERRERS.
     '''
     deterrers.add(ipv4, admin, profile, firewall)
+    if auto_register or register:
+        deterrers.action(ipv4, 'register')
 
 
 @cli.command()
