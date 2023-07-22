@@ -23,6 +23,10 @@ To configure the client, create a file `~/.deterrers.yml` with the following con
 ```yaml
 url: https://deterrers.example.com
 token: <api-token>
+
+# If you want to automatically register newly added hosts
+# Default: false
+auto-register: false
 ```
 
 ## Usane
