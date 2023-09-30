@@ -4,17 +4,9 @@ import json
 import pathlib
 import yaml
 
-from deterrerscli.types import IPV4_TYPE
+from deterrerscli import types
 
-deterrers = None
 auto_register = False
-
-profiles = click.Choice(
-        ('', 'HTTP', 'SSH', 'HTTP+SSH', 'Multipurpose'),
-        case_sensitive=False)
-host_firewalls = click.Choice(
-        ('', 'UFW', 'FirewallD', 'nftables'),
-        case_sensitive=False)
 
 
 def print_format(data, format: str):
@@ -35,7 +27,8 @@ def cli():
 
 
 @cli.command()
-@click.option('--format', default='json', help='Output format (json or yaml)')
+@click.option('--format', default='json', type=types.OUTPUT_TYPE,
+              help='Output format')
 def hosts(format):
     '''List all IPs added to DETERRERS.
     '''
@@ -44,8 +37,9 @@ def hosts(format):
 
 
 @cli.command()
-@click.option('--format', default='json', help='Output format (json or yaml)')
-@click.argument('ipv4', type=IPV4_TYPE)
+@click.option('--format', default='json', type=types.OUTPUT_TYPE,
+              help='Output format')
+@click.argument('ipv4', type=types.IPV4_TYPE)
 def get(format, ipv4):
     '''Get information about an IP address in DETERRERS.
     '''
@@ -54,7 +48,7 @@ def get(format, ipv4):
 
 
 @cli.command()
-@click.argument('ipv4', type=IPV4_TYPE)
+@click.argument('ipv4', type=types.IPV4_TYPE)
 def delete(ipv4):
     '''Delete IP address from DETERRERS.
     '''
@@ -63,23 +57,24 @@ def delete(ipv4):
 
 @cli.command()
 @click.option('--admin', '-a', multiple=True, required=True)
-@click.option('--profile', '-p', default='', type=profiles)
-@click.option('--firewall', '-f', default='', type=host_firewalls)
-@click.option('--register/--no-register', default=False)
-@click.argument('ipv4', type=IPV4_TYPE)
+@click.option('--profile', '-p', default='', type=types.PROFILE_TYPE)
+@click.option('--firewall', '-f', default='', type=types.HOST_FIREWALL_TYPE)
+@click.option('--register/--no-register', default=False,
+              help='If the added host should be registered immediately')
+@click.argument('ipv4', type=types.IPV4_TYPE)
 def add(ipv4, admin, profile, firewall, register):
     '''Add IP address to DETERRERS.
     '''
     deterrers.add(ipv4, admin, profile, firewall)
-    if auto_register or register:
+    if profile and auto_register or register:
         deterrers.action(ipv4, 'register')
 
 
 @cli.command()
 @click.option('--admin', '-a', default=None, multiple=True)
-@click.option('--profile', '-p', default=None, type=profiles)
-@click.option('--firewall', '-f', default=None, type=host_firewalls)
-@click.argument('ipv4', type=IPV4_TYPE)
+@click.option('--profile', '-p', default=None, type=types.PROFILE_TYPE)
+@click.option('--firewall', '-f', default=None, type=types.HOST_FIREWALL_TYPE)
+@click.argument('ipv4', type=types.IPV4_TYPE)
 def update(ipv4, admin, profile, firewall):
     '''Update IP address in DETERRERS.
 
@@ -98,7 +93,7 @@ def action():
 
 
 @action.command()
-@click.argument('ipv4', type=IPV4_TYPE)
+@click.argument('ipv4', type=types.IPV4_TYPE)
 def register(ipv4):
     '''Activate profile in perimeter firewall.
     '''
@@ -106,7 +101,7 @@ def register(ipv4):
 
 
 @action.command()
-@click.argument('ipv4', type=IPV4_TYPE)
+@click.argument('ipv4', type=types.IPV4_TYPE)
 def block(ipv4):
     '''Block IP address perimeter firewall.
     '''

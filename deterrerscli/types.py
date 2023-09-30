@@ -25,3 +25,15 @@ class IPv4Type(click.ParamType):
 
 
 IPV4_TYPE = IPv4Type()
+
+PROFILE_TYPE = click.Choice(
+        ('', 'HTTP', 'SSH', 'HTTP+SSH', 'Multipurpose'),
+        case_sensitive=False)
+
+HOST_FIREWALL_TYPE = click.Choice(
+        ('', 'UFW', 'FirewallD', 'nftables'),
+        case_sensitive=False)
+
+OUTPUT_TYPE = click.Choice(
+        ('json', 'yaml'),
+        case_sensitive=False)
