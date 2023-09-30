@@ -79,3 +79,26 @@ Options:
 # Activate firewall profile
 ❯ deterrers-cli action register 192.0.0.1
 ```
+
+
+## Shell Completion
+
+The `deterrers-cli` command line tool supports shell completion for several major shells:
+
+For **Bash**, add to `~/.bashrc`:
+
+```
+eval "$(_DETERRERS_CLI_COMPLETE=bash_source deterrers-cli)"
+```
+
+For **ZSH**, add to `~/.zshrc`:
+
+```
+eval "$(_DETERRERS_CLI_COMPLETE=zsh_source deterrers-cli)"
+```
+
+For **fish**, add to `~/.config/fish/completions/deterrers-cli.fish`:
+
+```
+_DETERRERS_CLI_COMPLETE=fish_source deterrers-cli | source
+```
