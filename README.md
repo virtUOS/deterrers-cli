@@ -27,6 +27,10 @@ token: <api-token>
 # If you want to automatically register newly added hosts
 # Default: false
 auto-register: false
+
+# If you want to skip the initial security scan by default.
+# Default: false
+auto-skip-scan: false
 ```
 
 ## Usane
