@@ -7,6 +7,7 @@ import yaml
 from deterrerscli import types
 
 auto_register = False
+auto_skip_scan = False
 
 
 def print_format(data, format: str):
@@ -20,10 +21,12 @@ def print_format(data, format: str):
 def cli():
     global deterrers
     global auto_register
+    global auto_skip_scan
     with open(pathlib.Path().home() / '.deterrers.yml', 'r') as f:
         config = yaml.safe_load(f)
     deterrers = deterrersapi.Deterrers(config['url'], config['token'])
     auto_register = config.get('auto-register', False)
+    auto_skip_scan = config.get('auto-skip-scana', False)
 
 
 @cli.command()
@@ -61,13 +64,17 @@ def delete(ipv4):
 @click.option('--firewall', '-f', default='', type=types.HOST_FIREWALL_TYPE)
 @click.option('--register/--no-register', default=False,
               help='If the added host should be registered immediately')
+@click.option('--skip-scan/--no-skip-scan', default=None,
+              help='If the added host should get an initial security scan. '
+              'Only applies if it is being registered')
 @click.argument('ipv4', type=types.IPV4_TYPE)
-def add(ipv4, admin, profile, firewall, register):
+def add(ipv4, admin, profile, firewall, register, skip_scan):
     '''Add IP address to DETERRERS.
     '''
     deterrers.add(ipv4, admin, profile, firewall)
     if profile and auto_register or register:
-        deterrers.action(ipv4, 'register')
+        skip_scan = auto_skip_scan if skip_scan is None else skip_scan
+        deterrers.action(ipv4, 'register', skip_scan)
 
 
 @cli.command()
@@ -94,10 +101,13 @@ def action():
 
 @action.command()
 @click.argument('ipv4', type=types.IPV4_TYPE)
-def register(ipv4):
+@click.option('--skip-scan/--no-skip-scan', default=None,
+              help='If the added host should get an initial security scan')
+def register(ipv4, skip_scan):
     '''Activate profile in perimeter firewall.
     '''
-    deterrers.action(ipv4, 'register')
+    skip_scan = auto_skip_scan if skip_scan is None else skip_scan
+    deterrers.action(ipv4, 'register', skip_scan)
 
 
 @action.command()
