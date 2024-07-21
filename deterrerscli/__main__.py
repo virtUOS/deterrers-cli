@@ -62,7 +62,7 @@ def delete(ipv4):
 @click.option('--admin', '-a', multiple=True, required=True)
 @click.option('--profile', '-p', default='', type=types.PROFILE_TYPE)
 @click.option('--firewall', '-f', default='', type=types.HOST_FIREWALL_TYPE)
-@click.option('--register/--no-register', default=False,
+@click.option('--register/--no-register', default=None,
               help='If the added host should be registered immediately')
 @click.option('--skip-scan/--no-skip-scan', default=None,
               help='If the added host should get an initial security scan. '
@@ -72,7 +72,7 @@ def add(ipv4, admin, profile, firewall, register, skip_scan):
     '''Add IP address to DETERRERS.
     '''
     deterrers.add(ipv4, admin, profile, firewall)
-    if profile and auto_register or register:
+    if profile and (auto_register if register is None else register):
         skip_scan = auto_skip_scan if skip_scan is None else skip_scan
         deterrers.action(ipv4, 'register', skip_scan)
 
