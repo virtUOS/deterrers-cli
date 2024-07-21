@@ -17,6 +17,22 @@ def print_format(data, format: str):
         print(json.dumps(data, indent=4))
 
 
+def _add(ipv4, admin, profile, firewall, register, skip_scan):
+    '''Add IP address to DETERRERS.
+    '''
+    deterrers.add(ipv4, admin, profile, firewall)
+    if profile and (auto_register if register is None else register):
+        skip_scan = auto_skip_scan if skip_scan is None else skip_scan
+        deterrers.action(ipv4, 'register', skip_scan)
+
+
+def _update(ipv4, admin, profile, firewall):
+    '''Update IP address in DETERRERS.
+    '''
+    admin = admin or None
+    deterrers.update(ipv4, profile, firewall, admin)
+
+
 @click.group()
 def cli():
     global deterrers
@@ -71,10 +87,7 @@ def delete(ipv4):
 def add(ipv4, admin, profile, firewall, register, skip_scan):
     '''Add IP address to DETERRERS.
     '''
-    deterrers.add(ipv4, admin, profile, firewall)
-    if profile and (auto_register if register is None else register):
-        skip_scan = auto_skip_scan if skip_scan is None else skip_scan
-        deterrers.action(ipv4, 'register', skip_scan)
+    return _add(ipv4, admin, profile, firewall, register, skip_scan)
 
 
 @cli.command()
@@ -88,8 +101,27 @@ def update(ipv4, admin, profile, firewall):
     Fields which are not specified will not be changed.
     The option `admin` can be used multiple times.
     '''
-    admin = admin or None
-    deterrers.update(ipv4, profile, firewall, admin)
+    return _update(ipv4, admin, profile, firewall)
+
+
+@cli.command()
+@click.option('--admin', '-a', multiple=True, required=True)
+@click.option('--profile', '-p', default='', type=types.PROFILE_TYPE)
+@click.option('--firewall', '-f', default='', type=types.HOST_FIREWALL_TYPE)
+@click.option('--register/--no-register', default=None,
+              help='If the added host should be registered immediately')
+@click.option('--skip-scan/--no-skip-scan', default=None,
+              help='If the added host should get an initial security scan. '
+              'Only applies if it is being registered')
+@click.argument('ipv4', type=types.IPV4_TYPE)
+def set(ipv4, admin, profile, firewall, register, skip_scan):
+    '''Add IP address to DETERRERS if it is not added already. Otherwise,
+    update the data. Note that hosts will not be automatically registered when
+    updating data.
+    '''
+    if deterrers.get(ipv4):
+        return _update(ipv4, admin, profile, firewall)
+    return _add(ipv4, admin, profile, firewall, register, skip_scan)
 
 
 @cli.group()
